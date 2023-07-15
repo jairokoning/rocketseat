@@ -29,7 +29,7 @@ export function Post() {
           placeholder='Deixe seu comentário'
         />
         <footer>
-          <button type='submit'>Comentar</button>
+          <button type='submit'>Publicar</button>
         </footer>        
       </form>
     </article>
