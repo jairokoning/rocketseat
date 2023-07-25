@@ -3,8 +3,12 @@ import ptBR from 'date-fns/locale/pt-BR';
 import { Avatar } from './Avatar';
 import { Comment } from './Comment';
 import styles from './Post.module.css';
+import { useState } from 'react';
 
 export function Post({ author, publishedAt, content}) {
+  const [comments, setComments] = useState(['Post muito top, valeu por contribuir com a comunidade']);
+  const [newCommentText, setNewCommentText] = useState('');
+
   const publishedDateFormatted = format(publishedAt, "d 'de' LLLL 'às' H'h'mm", {
     locale: ptBR
   })
@@ -12,6 +16,16 @@ export function Post({ author, publishedAt, content}) {
     locale: ptBR,
     addSuffix: true,
   })
+
+  function handleCreateNewComment(e) {
+    e.preventDefault();
+    setComments([...comments, newCommentText]);
+    setNewCommentText('');
+  }
+
+  function handleNewCommentChange(e) {
+    setNewCommentText(e.target.value);
+  }
 
   return (
     <article className={styles.post}>
@@ -26,50 +40,44 @@ export function Post({ author, publishedAt, content}) {
         <time title={publishedDateFormatted} dateTime={publishedAt.toISOString()}>{publishedDateRelativeToNow}</time>
       </header>
       <div className={styles.content}>
-        {content.map((line, index) => {
+        {content.map((line) => {
           if (line.type === "paragraph") {
-            return <p key={`line-${index}`}>{line.content}</p>
+            return <p key={line.content}>{line.content}</p>
           }
           if (line.type === "link") {
-            return (<p key={`line-${index}`}>👉{' '}<a href="">{line.content}</a></p>)
+            return (<p key={line.content}>👉{' '}<a href="">{line.content}</a></p>)
           }
-          if (line.type === "tags") {            
+          if (line.type === "tags") {          
             return (
-              <p key={`line-${index}`}>
-                {line.content.map((tag, tagIndex) => {
+              <p key={line.content}>
+                {line.content.map((tag) => {
                   return (
-                    <>
-                      <a key={`tag-${tagIndex}`} href="">{tag}</a>{' '}
-                    </>                    
+                    <span key={tag}>
+                      <a href="">{tag}</a>{' '}
+                    </span>                    
                   )
                 })}
               </p>
             )            
           }
-          return <></>
         })}
-        {/* <p>Fala galeraa 👋</p>
-        <p>Acabei de subir mais um projeto no meu portifa. É um projeto que fiz no NLW Return, evento da Rocketseat. O nome do projeto é DoctorCare 🚀</p>
-        <p>👉{' '}<a href="">jane.design/doctorcare</a></p>
-        <p>
-          <a href="">#novoprojeto</a>{' '}
-          <a href="">#nlw</a>{' '}
-          <a href="">#rocketseat</a>
-        </p> */}
       </div>
-      <form className={styles.commentForm}>
+      <form onSubmit={(event) => handleCreateNewComment(event)} className={styles.commentForm}>
         <strong>Deixe seu feedback</strong>
-        <textarea 
+        <textarea
+          name="comment" 
           placeholder='Deixe seu comentário'
+          onChange={(event) => handleNewCommentChange(event)}
+          value={newCommentText}
         />
         <footer>
           <button type='submit'>Publicar</button>
         </footer>        
       </form>
       <div className={styles.commentList}>
-        <Comment />
-        <Comment />
-        <Comment />
+        {comments.map(comment => {
+          return <Comment key={comment} comment={comment} />
+        })}
       </div>
     </article>
   )
