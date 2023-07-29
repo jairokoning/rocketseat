@@ -1,9 +1,9 @@
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { Avatar } from './Avatar';
 import { Comment } from './Comment';
 import styles from './Post.module.css';
-import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 
 interface Author {
   name: string;
@@ -12,15 +12,10 @@ interface Author {
 }
 
 interface Content {
+  id: number;
   type: 'paragraph' | 'link' | 'tags';
   content: string | string[];
 }
-
-interface ContentTag {
-  type: 'paragraph' | 'link' | 'tags';
-  content: string[];
-}
-
 export interface PostProps {
   author: Author;
   publishedAt: Date;
@@ -78,14 +73,14 @@ export function Post({ author, publishedAt, content}: PostProps) {
       <div className={styles.content}>
         {content.map((line) => {
           if (line.type === "paragraph") {
-            return <p key={line.content}>{line.content}</p>
+            return <p key={line.id}>{line.content}</p>
           }
           if (line.type === "link") {
-            return (<p key={line.content}>👉{' '}<a href="">{line.content}</a></p>)
+            return (<p key={line.id}>👉{' '}<a href="">{line.content}</a></p>)
           }
-          if (line.type === "tags") {          
-            return (
-              <p key={line.content}>
+          if (line.type === "tags" && Array.isArray(line.content)) {          
+            return (              
+              <p key={line.id}>
                 {line.content.map((tag: string) => {
                   return (
                     <span key={tag}>
@@ -103,9 +98,9 @@ export function Post({ author, publishedAt, content}: PostProps) {
         <textarea
           name="comment" 
           placeholder='Deixe seu comentário'
-          onChange={(event) => handleNewCommentChange(event)}
+          onChange={handleNewCommentChange}
           value={newCommentText}
-          onInvalid={(event) => handleNewCommentInvalid(event)}
+          onInvalid={handleNewCommentInvalid}
           required
         />
         <footer>
